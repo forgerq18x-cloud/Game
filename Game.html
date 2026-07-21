@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Tebak Angka Terlarang</title>
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --surface: #1a1a2e;
+            --surface2: #222236;
+            --primary: #ff6b6b;
+            --primary2: #ff4757;
+            --accent: #ffd93d;
+            --accent2: #ff9f43;
+            --text: #e8e8f0;
+            --text2: #b0b0c8;
+            --success: #2ed573;
+            --info: #54a0ff;
+            --danger: #ff4757;
+            --border: #2a2a40;
+            --radius: 16px
+            --radius-sm: 10px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(255, 107, 107, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(255, 217, 61, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(84, 160, 255, 0.04) 0%, transparent 70%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            color: var(--text);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 560px;
+            background: var(--surface);
+            border-radius: 24px;
+            box-shadow: var(--shadow), 0 0 0 1px var(--border);
+            padding: 28px 24px 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--info), var(--primary));
+            border-radius: 24px 24px 0 0;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .game-header .icon {
+            font-size: 48px;
+            display: block;
+            animation: bounce-icon 2s ease-in-out infinite;
+        }
+        @keyframes bounce-icon {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-14px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            70% {
+                transform: translateY(-7px);
+            }
+        }
+        .game-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 4px 0 0;
+        }
+        .game-header .subtitle {
+            font-size: 0.85rem;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        .phase {
+            display: none;
+            animation: fadeSlideIn 0.4s ease;
+        }
+        .phase.active {
+            display: block;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--surface2);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+        .card h3 .emoji {
+            font-size: 1.3rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text2);
+            letter-spacing: 0.3px;
+        }
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: var(--font);
+            transition: var(--transition);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+        }
+        input.invalid {
+            border-color: var(--danger);
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            60% {
+                transform: translateX(-4px);
+            }
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .input-row .input-group {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            font-family: var(--font);
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.35);
+        }
+        .btn-primary:hover {
+            background: var(--primary2);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            background: rgba(255, 107, 107, 0.05);
+        }
+        .btn-sm {
+            padding: 7px 14px;
+            font-size: 0.8rem;
+            border-radius: 30px;
+        }
+        .btn-danger-sm {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid transparent;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .btn-danger-sm:hover {
+            background: rgba(255, 71, 87, 0.1);
+            border-color: rgba(255, 71, 87, 0.3);
+        }
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .player-tag {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .player-tag.current-turn {
+            border-color: var(--accent);
+            background: rgba(255, 217, 61, 0.08);
+            box-shadow: 0 0 20px rgba(255, 217, 61, 0.25);
+            animation: pulse-glow 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 217, 61, 0.25);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(255, 217, 61, 0.5);
+            }
+        }
+        .player-tag .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text2);
+            flex-shrink: 0;
+        }
+        .player-tag.current-turn .dot {
+            background: var(--accent);
+            animation: blink-dot 0.6s ease-in-out infinite;
+        }
+        @keyframes blink-dot {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .info-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .info-pill {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .info-pill span {
+            color: var(--text);
+            font-weight: 700;
+        }
+        .info-pill.bound-pill {
+            background: rgba(255, 217, 61, 0.08);
+            border-color: rgba(255, 217, 61, 0.3);
+            color: var(--accent);
+        }
+
+        .guess-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .guess-area input {
+            flex: 1;
+            min-width: 120px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 14px;
+        }
+        .guess-area .btn {
+            flex-shrink: 0;
+        }
+
+        .history-list {
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 4px;
+            scroll-behavior: smooth;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            border: 1px solid transparent;
+            animation: fadeSlideIn 0.3s ease;
+            flex-wrap: wrap;
+        }
+        .history-item .turn-badge {
+            background: var(--surface2);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .history-item .guess-num {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+            min-width: 40px;
+            text-align: center;
+        }
+        .history-item .hint-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .hint-up {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+        }
+        .hint-down {
+            background: rgba(84, 160, 255, 0.15);
+            color: #54a0ff;
+        }
+
+        .punishment-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .punishment-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .punishment-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .punishment-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .punishment-chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .punishment-chip .remove-btn {
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--danger);
+            line-height: 1;
+            opacity: 0.6;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            padding: 0 2px;
+        }
+        .punishment-chip .remove-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        .add-punishment-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .add-punishment-row input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .game-over-content {
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .game-over-content .skull {
+            font-size: 64px;
+            animation: bounce-icon 0.6s ease;
+        }
+        .game-over-content .loser-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 8px 0;
+        }
+        .game-over-content .punishment-reveal {
+            background: var(--surface2);
+            border: 2px dashed var(--accent);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 16px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            animation: reveal-pop 0.5s ease;
+        }
+        @keyframes reveal-pop {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .spinning-text {
+            display: inline-block;
+            animation: spin-text 0.08s steps(1) infinite;
+            color: var(--accent2);
+        }
+        @keyframes spin-text {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--danger);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(255, 71, 87, 0.4);
+            animation: toast-in 0.3s ease, toast-out 0.3s ease 2.5s forwards;
+            pointer-events: none;
+        }
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toast-out {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 14px 16px;
+                border-radius: 20px;
+            }
+            .container::before {
+                border-radius: 20px 20px 0 0;
+            }
+            .game-header .icon {
+                font-size: 36px;
+            }
+            .game-header h1 {
+                font-size: 1.3rem;
+            }
+            .btn {
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+            .guess-area input {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            .card {
+                padding: 14px;
+            }
+            .history-list {
+                max-height: 160px;
+            }
+            .player-tag {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+            .info-pill {
+                font-size: 0.7rem;
+                padding: 6px 12px;
+            }
+        }
+        @media (max-width: 360px) {
+            .input-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .guess-area {
+                flex-direction: column;
+            }
+            .guess-area .btn {
+                width: 100%;
+            }
+            .btn-full-mobile {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="appContainer">
+        <div class="game-header">
+            <span class="icon">🎯</span>
+            <h1>Tebak Angka Terlarang</h1>
+            <p class="subtitle">Hindari angka rahasia... atau kena hukuman!</p>
+        </div>
+
+        <!-- Fase 1: Setup Rentang -->
+        <div class="phase active" id="phaseRange">
+            <div class="card">
+                <h3><span class="emoji">🔢</span> Atur Rentang Angka</h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="minRange">Angka Terkecil</label>
+                        <input type="number" id="minRange" value="1" placeholder="Contoh: 1">
+                    </div>
+                    <div class="input-group">
+                        <label for="maxRange">Angka Terbesar</label>
+                        <input type="number" id="maxRange" value="100" placeholder="Contoh: 100">
+                    </div>
+                </div>
+                <p style="font-size:0.75rem;color:var(--text2);margin-top:8px;">
+                    ✨ Rentang bisa negatif juga lho! Contoh: -200 sampai 100
+                </p>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="goToPlayerSetup()">
+                Lanjut ke Pemain 👥
+            </button>
+        </div>
+
+        <!-- Fase 2: Setup Pemain -->
+        <div class="phase" id="phasePlayers">
+            <div class="card">
+                <h3><span class="emoji">👥</span> Jumlah Pemain</h3>
+                <div class="input-row" style="align-items:center;">
+                    <input type="number" id="playerCount" value="3" min="2" max="10" style="max-width:100px;text-align:center;">
+                    <span style="color:var(--text2);font-size:0.85rem;">orang (min. 2, maks. 10)</span>
+                </div>
+            </div>
+            <div class="card">
+                <h3><span class="emoji">📝</span> Nama Pemain</h3>
+                <div id="playerNameInputs"></div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="goToPunishmentSetup()">
+                Lanjut ke Hukuman ⚡
+            </button>
+            <button class="btn btn-outline btn-full" style="margin-top:8px;" onclick="backToRange()">
+                ⬅ Kembali
+            </button>
+        </div>
+
+        <!-- Fase 3: Setup Hukuman -->
+        <div class="phase" id="phasePunishments">
+            <div class="card">
+                <h3><span class="emoji">😈</span> Daftar Hukuman</h3>
+                <p style="font-size:0.8rem;color:var(--text2);margin-bottom:10px;">
+                    Hukuman bawaan sudah ada. Kamu bisa hapus atau tambah sendiri.
+                </p>
+                <div class="punishment-list" id="punishmentList"></div>
+                <div class="add-punishment-row">
+                    <input type="text" id="newPunishment" placeholder="Tambah hukuman baru..." maxlength="120">
+                    <button class="btn btn-outline btn-sm" onclick="addPunishment()">➕ Tambah</button>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="startGame()">
+                🚀 Mulai Permainan!
+            </button>
+            <button class="btn btn-outline btn-full" style="margin-top:8px;" onclick="backToPlayers()">
+                ⬅ Kembali
+            </button>
+        </div>
+
+        <!-- Fase 4: Permainan -->
+        <div class="phase" id="phaseGame">
+            <div class="info-bar">
+                <div class="info-pill">🎯 Range: <span id="displayRange"></span></div>
+                <div class="info-pill bound-pill">📏 Batas aman: <span id="boundDisplay"></span></div>
+                <div class="info-pill">🔢 Angka tersisa: <span id="remainingCount"></span></div>
+            </div>
+            <div class="card">
+                <h3><span class="emoji">🔄</span> Giliran</h3>
+                <div class="player-list" id="playerListGame"></div>
+            </div>
+            <div class="card">
+                <h3><span class="emoji">🎲</span> Tebak Angka</h3>
+                <p style="font-size:0.8rem;color:var(--text2);margin-bottom:8px;" id="turnPrompt"></p>
+                <div class="guess-area">
+                    <input type="number" id="guessInput" placeholder="Masukkan tebakan...">
+                    <button class="btn btn-primary" onclick="submitGuess()">🗣️ Tebak!</button>
+                </div>
+                <p style="font-size:0.7rem;color:var(--text2);margin-top:6px;" id="guessHint"></p>
+            </div>
+            <div class="card">
+                <h3><span class="emoji">📜</span> Riwayat Tebakan</h3>
+                <div class="history-list" id="historyList">
+                    <p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:20px;">
+                        Belum ada tebakan. Giliran pertama!
+                    </p>
+                </div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="confirmRestart()">
+                🔄 Mulai Ulang (setting baru)
+            </button>
+        </div>
+
+        <!-- Fase 5: Game Over -->
+        <div class="phase" id="phaseGameOver">
+            <div class="game-over-content">
+                <div class="skull">💀</div>
+                <h2 style="color:var(--text);">Game Over!</h2>
+                <p style="color:var(--text2);">Yang kena angka terlarang adalah:</p>
+                <div class="loser-name" id="loserNameDisplay"></div>
+                <p style="color:var(--text2);">Angka rahasianya: <strong style="color:var(--primary);" id="secretReveal"></strong></p>
+                <div class="punishment-reveal" id="punishmentReveal"></div>
+                <p style="font-size:0.8rem;color:var(--text2);">😈 Hukuman harus dijalankan!</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+                    <button class="btn btn-primary" onclick="playAgainSame()">🔁 Main Lagi (Setting Sama)</button>
+                    <button class="btn btn-outline" onclick="fullRestart()">🆕 Setting Baru</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ============ STATE ============
+            const state = {
+                minRange: 1,
+                maxRange: 100,
+                secretNumber: null,
+                players: [],
+                currentPlayerIndex: 0,
+                guessHistory: [],
+                punishments: [
+                    'Menyanyi lagu anak-anak di depan semua pemain 🎤',
+                    'Push-up 20 kali 💪',
+                    'Jongkok sambil tahan telinga 10 kali 🙉',
+                    'Menggonggong seperti anjing 3x 🐶',
+                    'Bercerita dengan suara lucu selama 1 menit 🤪',
+                    'Menari "Chicken Dance" 🐔',
+                    'Minum air putih 2 gelas sekaligus 💧',
+                    'Membuat pantun dadakan 🎭',
+                    'Berjalan mundur keliling ruangan 🚶‍♂️',
+                    'Tahan tawa selama 30 detik sambil ditatap 😐',
+                ],
+                gamePhase: 'range',
+                usedNumbers: new Set(),
+                lowerBound: null,
+                upperBound: null,
+            };
+
+            // ============ DOM REFS ============
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const phaseRange = $('#phaseRange');
+            const phasePlayers = $('#phasePlayers');
+            const phasePunishments = $('#phasePunishments');
+            const phaseGame = $('#phaseGame');
+            const phaseGameOver = $('#phaseGameOver');
+
+            const minRangeInput = $('#minRange');
+            const maxRangeInput = $('#maxRange');
+            const playerCountInput = $('#playerCount');
+            const playerNameInputs = $('#playerNameInputs');
+            const punishmentList = $('#punishmentList');
+            const newPunishmentInput = $('#newPunishment');
+            const guessInput = $('#guessInput');
+            const historyList = $('#historyList');
+            const playerListGame = $('#playerListGame');
+            const displayRange = $('#displayRange');
+            const boundDisplay = $('#boundDisplay');
+            const remainingCount = $('#remainingCount');
+            const turnPrompt = $('#turnPrompt');
+            const guessHint = $('#guessHint');
+            const loserNameDisplay = $('#loserNameDisplay');
+            const secretReveal = $('#secretReveal');
+            const punishmentReveal = $('#punishmentReveal');
+
+            // ============ HELPERS ============
+            function showPhase(phaseName) {
+                [phaseRange, phasePlayers, phasePunishments, phaseGame, phaseGameOver].forEach(p => p
+                    .classList.remove('active'));
+                const map = {
+                    'range': phaseRange,
+                    'players': phasePlayers,
+                    'punishments': phasePunishments,
+                    'game': phaseGame,
+                    'gameover': phaseGameOver,
+                };
+                if (map[phaseName]) map[phaseName].classList.add('active');
+                state.gamePhase = phaseName;
+                document.getElementById('appContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function showToast(msg) {
+                const existing = document.querySelector('.toast');
+                if (existing) existing.remove();
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2800);
+            }
+
+            function getRandomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function getRandomPunishment() {
+                if (state.punishments.length === 0) return 'Tidak ada hukuman tersedia 🤷';
+                const idx = Math.floor(Math.random() * state.punishments.length);
+                return state.punishments[idx];
+            }
+
+            // ============ PHASE: RANGE ============
+            window.goToPlayerSetup = function() {
+                let min = parseInt(minRangeInput.value);
+                let max = parseInt(maxRangeInput.value);
+
+                if (isNaN(min) || isNaN(max)) {
+                    showToast('⚠️ Isi kedua rentang angka dengan benar!');
+                    if (isNaN(min)) minRangeInput.classList.add('invalid');
+                    if (isNaN(max)) maxRangeInput.classList.add('invalid');
+                    setTimeout(() => {
+                        minRangeInput.classList.remove('invalid');
+                        maxRangeInput.classList.remove('invalid');
+                    }, 600);
+                    return;
+                }
+                if (min >= max) {
+                    showToast('⚠️ Angka terkecil harus lebih kecil dari angka terbesar!');
+                    minRangeInput.classList.add('invalid');
+                    maxRangeInput.classList.add('invalid');
+                    setTimeout(() => {
+                        minRangeInput.classList.remove('invalid');
+                        maxRangeInput.classList.remove('invalid');
+                    }, 600);
+                    return;
+                }
+
+                state.minRange = min;
+                state.maxRange = max;
+                renderPlayerInputs();
+                showPhase('players');
+            };
+
+            window.backToRange = function() {
+                showPhase('range');
+            };
+
+            // ============ PHASE: PLAYERS ============
+            function renderPlayerInputs() {
+                const rawValue = parseInt(playerCountInput.value);
+                let count = rawValue;
+                if (isNaN(count) || count < 2) count = 2;
+                if (count > 10) count = 10;
+
+                let html = '';
+                for (let i = 0; i < count; i++) {
+                    html += `
+                    <div style="margin-bottom:8px;">
+                        <label>Nama Pemain ${i + 1}</label>
+                        <input type="text" class="player-name-input" 
+                               placeholder="Pemain ${i + 1}" 
+                               value="${escapeHTML(state.players[i] || '')}"
+                               maxlength="30"
+                               data-index="${i}">
+                    </div>`;
+                }
+                playerNameInputs.innerHTML = html;
+
+                const inputs = playerNameInputs.querySelectorAll('.player-name-input');
+                const newPlayers = [];
+                inputs.forEach((inp, idx) => {
+                    const val = inp.value.trim() || `Pemain ${idx + 1}`;
+                    newPlayers.push(val);
+                    inp.value = val;
+                    inp.addEventListener('input', () => {
+                        const i = parseInt(inp.dataset.index);
+                        state.players[i] = inp.value.trim() || `Pemain ${i + 1}`;
+                    });
+                });
+                state.players = newPlayers;
+            }
+
+            playerCountInput.addEventListener('change', renderPlayerInputs);
+            playerCountInput.addEventListener('blur', renderPlayerInputs);
+
+            playerCountInput.value = 3;
+            state.players = ['Pemain 1', 'Pemain 2', 'Pemain 3'];
+            renderPlayerInputs();
+
+            window.goToPunishmentSetup = function() {
+                const rawCount = parseInt(playerCountInput.value);
+                if (isNaN(rawCount) || rawCount < 2 || rawCount > 10) {
+                    showToast('⚠️ Jumlah pemain harus antara 2 dan 10!');
+                    playerCountInput.classList.add('invalid');
+                    setTimeout(() => playerCountInput.classList.remove('invalid'), 600);
+                    return;
+                }
+
+                const inputs = playerNameInputs.querySelectorAll('.player-name-input');
+                let allValid = true;
+                inputs.forEach(inp => {
+                    const val = inp.value.trim();
+                    if (!val) {
+                        inp.classList.add('invalid');
+                        allValid = false;
+                    } else {
+                        inp.classList.remove('invalid');
+                    }
+                    const idx = parseInt(inp.dataset.index);
+                    state.players[idx] = val || `Pemain ${idx + 1}`;
+                });
+                if (!allValid) {
+                    showToast('⚠️ Semua nama pemain harus diisi!');
+                    setTimeout(() => {
+                        inputs.forEach(inp => inp.classList.remove('invalid'));
+                    }, 600);
+                    return;
+                }
+
+                state.players = Array.from(inputs).map(inp => inp.value.trim());
+                renderPunishmentList();
+                showPhase('punishments');
+            };
+
+            window.backToPlayers = function() {
+                showPhase('players');
+            };
+
+            // ============ PHASE: PUNISHMENTS ============
+            function renderPunishmentList() {
+                let html = '';
+                state.punishments.forEach((p, i) => {
+                    html += `
+                    <div class="punishment-chip">
+                        ${escapeHTML(p)}
+                        <button class="remove-btn" onclick="removePunishment(${i})" title="Hapus hukuman">✕</button>
+                    </div>`;
+                });
+                if (state.punishments.length === 0) {
+                    html = '<p style="color:var(--text2);font-size:0.85rem;">⚠️ Tambahkan minimal 1 hukuman!</p>';
+                }
+                punishmentList.innerHTML = html;
+            }
+
+            window.addPunishment = function() {
+                const val = newPunishmentInput.value.trim();
+                if (!val) {
+                    showToast('⚠️ Tulis dulu hukumannya!');
+                    return;
+                }
+                if (val.length > 120) {
+                    showToast('⚠️ Hukuman terlalu panjang (maks 120 karakter)');
+                    return;
+                }
+                state.punishments.push(val);
+                newPunishmentInput.value = '';
+                renderPunishmentList();
+                newPunishmentInput.focus();
+            };
+
+            window.removePunishment = function(index) {
+                if (state.punishments.length <= 1) {
+                    showToast('⚠️ Minimal harus ada 1 hukuman!');
+                    return;
+                }
+                state.punishments.splice(index, 1);
+                renderPunishmentList();
+            };
+
+            newPunishmentInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.addPunishment();
+                }
+            });
+
+            // ============ PHASE: GAME ============
+            window.startGame = function() {
+                if (state.punishments.length === 0) {
+                    showToast('⚠️ Tambahkan minimal 1 hukuman sebelum mulai!');
+                    return;
+                }
+                state.secretNumber = getRandomInt(state.minRange, state.maxRange);
+                state.currentPlayerIndex = 0;
+                state.guessHistory = [];
+                state.usedNumbers = new Set();
+                state.lowerBound = state.minRange - 1;
+                state.upperBound = state.maxRange + 1;
+                state.gamePhase = 'game';
+
+                renderGameUI();
+                showPhase('game');
+                guessInput.value = '';
+                guessInput.focus();
+                guessHint.textContent = '';
+            };
+
+            function updateBoundsDisplay() {
+                const low = state.lowerBound + 1;
+                const high = state.upperBound - 1;
+                if (low <= high) {
+                    boundDisplay.textContent = `${low} – ${high}`;
+                } else {
+                    boundDisplay.textContent = '??';
+                }
+                const totalInRange = state.maxRange - state.minRange + 1;
+                const remaining = state.upperBound - state.lowerBound - 1;
+                remainingCount.textContent = Math.max(0, remaining);
+            }
+
+            function renderGameUI() {
+                displayRange.textContent = `${state.minRange} – ${state.maxRange}`;
+                updateBoundsDisplay();
+
+                let html = '';
+                state.players.forEach((name, i) => {
+                    const isCurrent = i === state.currentPlayerIndex;
+                    html += `
+                    <div class="player-tag ${isCurrent ? 'current-turn' : ''}">
+                        <span class="dot"></span>
+                        ${escapeHTML(name)}
+                        ${isCurrent ? ' 👈' : ''}
+                    </div>`;
+                });
+                playerListGame.innerHTML = html;
+
+                const currentPlayer = state.players[state.currentPlayerIndex];
+                turnPrompt.textContent = `🎤 Giliran ${currentPlayer}! Masukkan tebakanmu...`;
+
+                renderHistory();
+                guessInput.value = '';
+                guessHint.textContent = '';
+                guessInput.focus();
+            }
+
+            function renderHistory() {
+                if (state.guessHistory.length === 0) {
+                    historyList.innerHTML =
+                        '<p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:20px;">Belum ada tebakan. Giliran pertama!</p>';
+                } else {
+                    let html = '';
+                    state.guessHistory.forEach((h, i) => {
+                        const hintClass = h.hint === 'up' ? 'hint-up' : 'hint-down';
+                        const hintText = h.hint === 'up' ? '📈 Lebih besar' : '📉 Lebih kecil';
+                        html += `
+                        <div class="history-item">
+                            <span class="turn-badge">#${i + 1}</span>
+                            <span style="font-weight:600;">${escapeHTML(h.player)}</span>
+                            <span class="guess-num">${h.guess}</span>
+                            <span class="hint-tag ${hintClass}">${hintText}</span>
+                        </div>`;
+                    });
+                    historyList.innerHTML = html;
+                    historyList.scrollTop = historyList.scrollHeight;
+                }
+                updateBoundsDisplay();
+            }
+
+            window.submitGuess = function() {
+                if (state.gamePhase !== 'game') return;
+
+                const guess = parseInt(guessInput.value);
+                if (isNaN(guess)) {
+                    showToast('⚠️ Masukkan angka yang valid!');
+                    guessInput.classList.add('invalid');
+                    setTimeout(() => guessInput.classList.remove('invalid'), 600);
+                    return;
+                }
+                if (guess < state.minRange || guess > state.maxRange) {
+                    showToast(`⚠️ Angka harus antara ${state.minRange} dan ${state.maxRange}!`);
+                    guessInput.classList.add('invalid');
+                    setTimeout(() => guessInput.classList.remove('invalid'), 600);
+                    return;
+                }
+
+                // Validasi batas dinamis
+                if (guess <= state.lowerBound || guess >=state.upperBound) {
+                    showToast(`⚠️ Tebakan harus di antara ${state.lowerBound + 1} dan ${state.upperBound - 1}!`);
+                    guessInput.classList.add('invalid');
+                    setTimeout(() => guessInput.classList.remove('invalid'), 600);
+                    return;
+                }
+
+                // Cegah tebakan yang sudah pernah digunakan
+                if (state.usedNumbers.has(guess)) {
+                    showToast('⚠️ Angka ini sudah pernah ditebak! Pilih yang lain.');
+                    guessInput.classList.add('invalid');
+                    setTimeout(() => guessInput.classList.remove('invalid'), 600);
+                    return;
+                }
+
+                const currentPlayer = state.players[state.currentPlayerIndex];
+
+                // Jika tebakan adalah angka rahasia -> kalah
+                if (guess === state.secretNumber) {
+                    state.guessHistory.push({
+                        player: currentPlayer,
+                        guess: guess,
+                        hint: guess < state.secretNumber ? 'up' : 'down',
+                    });
+                    state.usedNumbers.add(guess);
+                    renderHistory();
+                    triggerGameOver(currentPlayer);
+                    return;
+                }
+
+                // Tebakan salah -> perbarui batas
+                const hint = guess < state.secretNumber ? 'up' : 'down';
+                if (hint === 'up') {
+                    state.lowerBound = Math.max(state.lowerBound, guess);
+                } else {
+                    state.upperBound = Math.min(state.upperBound, guess);
+                }
+
+                state.guessHistory.push({
+                    player: currentPlayer,
+                    guess: guess,
+                    hint: hint,
+                });
+                state.usedNumbers.add(guess);
+
+                if (hint === 'up') {
+                    guessHint.textContent = '📈 Angka rahasia LEBIH BESAR dari tebakan ini.';
+                    guessHint.style.color = '#ff6b6b';
+                } else {
+                    guessHint.textContent = '📉 Angka rahasia LEBIH KECIL dari tebakan ini.';
+                    guessHint.style.color = '#54a0ff';
+                }
+
+                state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
+                renderGameUI();
+                guessInput.focus();
+            };
+
+            guessInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.submitGuess();
+                }
+            });
+
+            function triggerGameOver(loserName) {
+                state.gamePhase = 'gameover';
+                const punishment = getRandomPunishment();
+
+                loserNameDisplay.textContent = loserName;
+                secretReveal.textContent = state.secretNumber;
+                punishmentReveal.textContent = punishment;
+
+                showPhase('gameover');
+                punishmentReveal.classList.add('spinning-text');
+                setTimeout(() => {
+                    punishmentReveal.classList.remove('spinning-text');
+                }, 1200);
+            }
+
+            // ============ RESTART ============
+            window.playAgainSame = function() {
+                state.secretNumber = getRandomInt(state.minRange, state.maxRange);
+                state.currentPlayerIndex = 0;
+                state.guessHistory = [];
+                state.usedNumbers = new Set();
+                state.lowerBound = state.minRange - 1;
+                state.upperBound = state.maxRange + 1;
+                state.gamePhase = 'game';
+                renderGameUI();
+                showPhase('game');
+                guessInput.value = '';
+                guessInput.focus();
+                guessHint.textContent = '';
+            };
+
+            window.fullRestart = function() {
+                state.minRange = 1;
+                state.maxRange = 100;
+                state.secretNumber = null;
+                state.players = [];
+                state.currentPlayerIndex = 0;
+                state.guessHistory = [];
+                state.usedNumbers = new Set();
+                state.gamePhase = 'range';
+                state.punishments = [
+                    'Menyanyi lagu anak-anak di depan semua pemain 🎤',
+                    'Push-up 20 kali 💪',
+                    'Jongkok sambil tahan telinga 10 kali 🙉',
+                    'Menggonggong seperti anjing 3x 🐶',
+                    'Bercerita dengan suara lucu selama 1 menit 🤪',
+                    'Menari "Chicken Dance" 🐔',
+                    'Minum air putih 2 gelas sekaligus 💧',
+                    'Membuat pantun dadakan 🎭',
+                    'Berjalan mundur keliling ruangan 🚶‍♂️',
+                    'Tahan tawa selama 30 detik sambil ditatap 😐',
+                ];
+                state.lowerBound = null;
+                state.upperBound = null;
+                minRangeInput.value = '1';
+                maxRangeInput.value = '100';
+                playerCountInput.value = '3';
+                newPunishmentInput.value = '';
+                guessInput.value = '';
+                guessHint.textContent = '';
+                state.players = ['Pemain 1', 'Pemain 2', 'Pemain 3'];
+                renderPlayerInputs();
+                renderPunishmentList();
+                showPhase('range');
+            };
+
+            window.confirmRestart = function() {
+                if (confirm('Yakin ingin mulai ulang dengan setting baru? Permainan saat ini akan dihentikan.')) {
+                    window.fullRestart();
+                }
+            };
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function init() {
+                minRangeInput.value = state.minRange;
+                maxRangeInput.value = state.maxRange;
+                renderPunishmentList();
+                showPhase('range');
+            }
+
+            document.addEventListener('focusin', (e) => {
+                if (e.target.tagName === 'INPUT') {
+                    setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            });
+
+            document.addEventListener('dblclick', function(e) {
+                if (e.target.closest('button')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            init();
+            console.log('🎯 Game Tebak Angka Terlarang siap dimainkan!');
+            console.log('📱 Responsif untuk HP & Desktop');
+            console.log('😈 Hindari angka rahasia... atau dapat hukuman!');
+        })();
+    </script>
+</body>
+</html>
